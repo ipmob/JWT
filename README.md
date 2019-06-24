@@ -106,3 +106,9 @@ The final effect is like this, the api can know from the jwt how much the user's
 
 
 # JWT
+
+## steps for adding DOCKER file:
+* add Dockerfile in /target
+* docker build 
+* docker run
+
