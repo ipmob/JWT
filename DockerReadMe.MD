@@ -43,6 +43,41 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 
 >> sudo docker run -p 8888:8888 jwt
 
+#### 5. pushing docker image to docker hub.
+
+* Create a repository on docker-hub ( Create a account first , its pretty much like github )
+  https://hub.docker.com/
+  
+** Log into the Docker Hub from the command line and put password when prompted 
+>> sudo docker login --username=yourhubusername
+
+** Check the image ID using 
+>> sudo docker images
+
+** you will have output like this:
+
+REPOSITORY              TAG                 IMAGE ID            CREATED             SIZE
+ipmob/jwt-auth          java8Base           6159e469dbc3        2 days ago          502MB
+jwt                     latest              6159e469dbc3        2 days ago          502MB
+demo                    latest              993f5a52bced        9 days ago          99.4MB
+my_docker_flask         latest              0700d4c42213        9 days ago          937MB
+ipmob/my_docker_flask   initialcommit       0700d4c42213        9 days ago          937MB
+<none>                  <none>              a50264eea61a        9 days ago          937MB
+openjdk                 8                   b84359d0cbce        2 weeks ago         488MB
+python                  3.6                 48c06762acf0        2 weeks ago         924MB
+openjdk                 8-jre-alpine        f7a292bbb70c        6 weeks ago         84.9MB
+ 
+** add tag to your image before pushing e.g. :
+
+>> docker tag 6159e469dbc3 ipmob/jwt-auth:latest
+
+** push your image now 
+>> sudo docker push yourhubusername/jwt-auth
+
+
+
+( Reference for pushing docker image ) 
+https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html
 
  
 
