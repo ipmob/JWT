@@ -1,0 +1,20 @@
+{
+    "family": "restfull-family",
+    "containerDefinitions": [
+        {
+            "image": "959307192450.dkr.ecr.ap-south-1.amazonaws.com/jwt_auth",
+            "name": "jwt-auth",
+            "cpu": 512,
+            "memory": 1024,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 8888,
+                    "hostPort": 8888
+                }
+            ]
+        }
+    ]
+}
+
+

@@ -1,0 +1,183 @@
+{
+	"svcnwAwsvpc": {
+		"Type": "AWS::ECS::Service",
+		"Condition": "SvcAWSVPC",
+		"Properties": {
+			"ServiceName": {
+				"Ref": "REPLACE_SERVICE_NAME"
+			},
+			"Cluster": {
+				"Ref": "ECSCluster"
+			},
+			"DesiredCount": {
+				"Ref": "DesiredTask"
+			},
+			"TaskDefinition": {
+				"Ref": "REPLACE_ECS_TASKDEFINITION"
+			},
+			"NetworkConfiguration": {
+				"AwsvpcConfiguration": {
+					"Subnets": {
+						"Ref": "SubnetId"
+					},
+					"SecurityGroups": [
+						{
+							"Ref": "EcsSecurityGroup"
+						}
+					]
+				}
+			}
+		}
+	},
+	"svcnwOthers": {
+		"Type": "AWS::ECS::Service",
+		"Condition": "SvcNoAWSVPC",
+		"Properties": {
+			"ServiceName": {
+				"Ref": "REPLACE_SERVICE_NAME"
+			},
+			"Cluster": {
+				"Ref": "ECSCluster"
+			},
+			"DesiredCount": {
+				"Ref": "DesiredTask"
+			},
+			"TaskDefinition": {
+				"Ref": "REPLACE_ECS_TASKDEFINITION"
+			}
+		}
+	},
+	"ServiceCPUUPAlarm": {
+		"Type": "AWS::CloudWatch::Alarm",
+		"Properties": {
+			"ActionsEnabled": "true",
+			"ComparisonOperator": "GreaterThanOrEqualToThreshold",
+			"EvaluationPeriods": "1",
+			"MetricName": "CPUUtilization",
+			"Namespace": "AWS/ECS",
+			"Period": "300",
+			"Statistic": "Average",
+			"Threshold": "60.0",
+			"Unit": "Percent",
+			"AlarmActions": [
+				{
+					"Ref": "REPLACE_SERVICECPU_SCALE_UP"
+				},
+				{
+					"Ref": "NotificationTopic"
+				}
+			],
+			"Dimensions": [
+				{
+					"Name": "ClusterName",
+					"Value": {
+						"Ref": "ECSCluster"
+					}
+				},
+				{
+					"Name": "ServiceName",
+					"Value": {
+						"Ref": "REPLACE_SERVICE_NAME"
+					}
+				}
+			]
+		}
+	},	
+	"ServiceCPUDownAlarm": {
+		"Type": "AWS::CloudWatch::Alarm",
+		"Properties": {
+			"ActionsEnabled": "true",
+			"ComparisonOperator": "LessThanOrEqualToThreshold",
+			"EvaluationPeriods": "1",
+			"MetricName": "CPUUtilization",
+			"Namespace": "AWS/ECS",
+			"Period": "300",
+			"Statistic": "Average",
+			"Threshold": "40.0",
+			"Unit": "Percent",
+			"AlarmActions": [
+				{
+					"Ref": "REPLACE_SERVICECPU_SCALE_DOWN"
+				},
+				{
+					"Ref": "NotificationTopic"
+				}
+			],
+			"Dimensions": [
+				{
+					"Name": "ClusterName",
+					"Value": {
+						"Ref": "ECSCluster"
+					}
+				},
+				{
+					"Name": "ServiceName",
+					"Value": {
+						"Ref": "REPLACE_SERVICE_NAME"
+					}
+				}
+			]
+		}
+	},
+	"ServiceCPUScaleUp": {
+		"Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+		"Properties": {
+			"PolicyName": "TaskscaleUP",
+			"PolicyType": "StepScaling",
+			"ScalingTargetId": {
+				"Ref": "REPLACE_SERVICE_SCALING_TARGET"
+			},
+			"StepScalingPolicyConfiguration": {
+				"AdjustmentType": "ChangeInCapacity",
+				"Cooldown": 60,
+				"MetricAggregationType": "Average",
+				"StepAdjustments": [
+					{
+						"MetricIntervalLowerBound": 0,
+						"ScalingAdjustment": 1
+					}
+				]
+			}
+		}
+	},
+	"ServiceCPUScaleDown": {
+		"Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+		"Properties": {
+			"PolicyName": "TaskscaleDOWN",
+			"PolicyType": "StepScaling",
+			"ScalingTargetId": {
+				"Ref": "REPLACE_SERVICE_SCALING_TARGET"
+			},
+			"StepScalingPolicyConfiguration": {
+				"AdjustmentType": "ChangeInCapacity",
+				"Cooldown": 60,
+				"MetricAggregationType": "Average",
+				"StepAdjustments": [
+					{
+						"MetricIntervalLowerBound": 0,
+						"ScalingAdjustment": -1
+					}
+				]
+			}
+		}
+	},
+    "ServiceScalingTarget" : {
+      "Type" : "AWS::ApplicationAutoScaling::ScalableTarget",
+      "Properties" : {
+        "MaxCapacity" : 2,
+        "MinCapacity" : 1,
+        "ResourceId" : {
+          "Fn::Join" : [ "", [ "service/", {
+            "Ref" : "ECSCluster"
+          }, "/", {
+            "Ref" : "REPLACE_SERVICE_NAME"
+          } ] ]
+        },
+        "RoleARN" : {
+          "Fn::GetAtt" : [ "AutoscalingRole", "Arn" ]
+        },
+        "ScalableDimension" : "ecs:service:DesiredCount",
+        "ServiceNamespace" : "ecs"
+      }
+    }
+}

@@ -1,0 +1,14 @@
+#external variables
+CLUSTNAME=$CLUSTERNAME
+CNAME=$ECSNAME
+REPO=$REPOSITORYNAME
+
+TASK_FAMILY="$CNAME-task"
+CONTAINER_NAME="$CNAME-container"
+SERVICE_NAME="$CNAME-service"
+
+aws ecs register-task-definition --cli-input-json file://taskdef-file.json
+# Update the service with the new task definition and desired count
+# Get the task revision number
+TASK_REVISION=`aws ecs describe-task-definition --task-definition $TASK_FAMILY | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/"$//'`
+aws ecs update-service --cluster $CLUSTNAME --service $SERVICE_NAME --task-definition $TASK_FAMILY:$TASK_REVISION

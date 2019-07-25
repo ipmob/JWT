@@ -1,0 +1,12 @@
+{
+	"serviceName": {
+		"Type": "String",
+		"Description": "Enter Name for ECS Service",
+		"Default": "SERVICE_NAME"
+	},
+	"taskDefinition": {
+		"Type": "String",
+		"Description": "Name of Task Definition.Ex:sampleapp:1",
+		"Default": "TASK_DEFINITION"
+	}
+}

@@ -1,0 +1,79 @@
+## TO-DO:
+
+USE ECR TO CREATE A IMAGE 
+PUSH ECR IMAGE TO ECS
+CREATE CLUSTER DEFINITION ECS
+CREATE TASK DEFINITION 
+
+reference to ecr cli
+https://docs.aws.amazon.com/cli/latest/reference/ecr/index.html
+
+
+-----------------ECR---------------------------------
+1. $ aws ecr describe-repositories
+2. $ aws ecr delete-repository --repository-name web_flask // just in case you need to clear up repositories 
+3. $ aws ecr create-repository --repository-name flask-api
+
+
+I skipped adding life cycle policy 
+life cycle policy helps in removing old images 
+here is a sample command
+
+$ aws ecr put-lifecycle-policy --registry-id 123456789012 --repository-name flask-api --lifecycle-policy-text '{"rules":[{"rulePriority":10,"description":"Expire old images","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":10},"action":{"type":"expire"}}]}'
+
+4. get login credential for local docker
+(aws ecr get-login --registry-ids 959307192450 --no-include-email)
+
+// make sure you build the docker image with same name 
+docker build -t flask-api .
+
+5. push the docker image from local to AWS
+sudo docker tag flask-api:latest 959307192450.dkr.ecr.us-ap-south-1.amazonaws.com/flask-api:latest
+
+
+6. for checking docker image
+aws ecr describe-images --repository-name flask-api
+
+7. docker push 959307192450.dkr.ecr.ap-south-1.amazonaws.com/flask-api:latest
+
+ region -- ap-south-1
+
+
+959307192450.dkr.ecr.ap-south-1.amazonaws.com/flask-api
+959307192450.dkr.ecr.ap-south-1.amazonaws.com/jwt_auth
+
+-----------------------------------ECS--------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------ECS-------------------------------------------------
+
+aws ecs list-clusters //to list all clusters
+aws ecs list-services --cluster flaskCluster // to list services 
+
+
+
+
+
+to run health check :
+CMD-SHELL , curf -f http:localhost:5000 || exit 1
+
+
+aws ecs create-service --cluster restful --service-name flask-service --task-definition restful-family  --role ecs-service-role --desired-count 0
+
