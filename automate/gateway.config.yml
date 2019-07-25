@@ -1,0 +1,79 @@
+
+http:
+  port: 8080
+admin:
+  port: 9876
+  host: localhost
+apiEndpoints:   
+  oms:
+    host: '*'
+    paths: '/resources/v1/*'
+  bb:
+    host: '*'
+    paths: '/perpule-prod/bigbazaar/*'
+  flask:
+    host: '*'
+    paths: '/*'
+  jwt-auth-login:
+    host: '*'
+    paths: '/login/*'    
+  jwt-auth-token:
+    host: '*'
+    paths: '/api/protected/*'
+serviceEndpoints:  
+  omsService:
+    url: 'https://perpule-1248.appspot.com'
+  bbService:
+    url:  'http://34.210.250.70:8080'
+  flaskService:
+    url: 'http://localhost:5000/'
+  jwt-auth-loginService:
+    url: 'http://localhost:8888/'
+  jwt-auth-tokenService:
+    url: 'http://localhost:8888/'
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy 
+  - rate-limit
+pipelines:  
+- name: default
+  apiEndpoints:      
+      - oms
+  policies:
+    - proxy:
+      - action:
+         serviceEndpoint: omsService        
+         changeOrigin: true
+- name: default-1
+  apiEndpoints:      
+      - bb
+  policies:
+    - proxy:
+      - action:
+         serviceEndpoint: bbService        
+         changeOrigin: true
+- name: default-2
+  apiEndpoints:      
+      - flask
+  policies:
+    - proxy:
+      - action:
+         serviceEndpoint: flaskService        
+         changeOrigin: true
+- name: default-3
+  apiEndpoints:      
+      - jwt-auth-login
+  policies:
+    - proxy:
+      - action:
+         serviceEndpoint: jwt-auth-loginService        
+         changeOrigin: true
+  
+
+
+
